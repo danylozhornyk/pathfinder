@@ -7,6 +7,7 @@
 #include <fcntl.h>
 
 //Custom pack
+int mx_strncmp(const char *s1, const char *s2, int n);
 bool mx_is_start_substr(const char *str, const char *sub);
 bool mx_is_space(char c);
 

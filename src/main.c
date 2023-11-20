@@ -1,22 +1,37 @@
 #include "../inc/pathfinder.h"
 
-int main(int argc, char const *argv[])
-{
-    if (argc != 2)
-    {
-        mx_error_invalid_input();
-    }
-    char const *filename = argv[1];
+int main(int argc, char *argv[]){
+  if(argc != 2){
+    mx_printerr("usage: ./pathfinder [filename]\n");
+    exit(-1);
+  }
 
-    mx_file_validation(filename);
+  char *str_file = mx_file_to_str(argv[1]);
+  mx_file_validation(argv[1], str_file);
 
-    t_graph *graph;
-    char **islands = mx_parse_file(mx_file_to_str(filename), &graph);
+  int islands_count = mx_get_island_count(str_file);
+  char **line_arr = mx_strsplit(str_file, '\n');
+  char **islands_arr = mx_islands_arr_fill(line_arr, islands_count);
 
-    mx_pathfinder(graph, islands);
+  int **islands_matrix = mx_form_dijkstra_matrix(islands_arr, line_arr, islands_count);
+  int **islands_matrix_copy =  mx_form_dijkstra_matrix(islands_arr, line_arr, islands_count);
 
-    mx_del_strarr(&islands);
-    mx_free_graph(&graph);
+  mx_dijkstra_algorithm(&islands_matrix, islands_count);
 
-    return 0;
+  mx_print_all_paths(islands_matrix_copy, islands_matrix, islands_count, islands_arr);
+
+  mx_strdel(&str_file);
+  mx_del_strarr(&line_arr);
+  mx_del_strarr(&islands_arr);
+
+  for (int i = 0; i < islands_count; i++) {
+    free(islands_matrix[i]);
+    free(islands_matrix_copy[i]);
+  }
+
+  free(islands_matrix);
+  free(islands_matrix_copy);
+
+  return 0;
+
 }
